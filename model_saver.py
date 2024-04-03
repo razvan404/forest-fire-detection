@@ -18,5 +18,5 @@ class ModelSaver:
         with open(os.path.join(base_path, "paths.jsonl"), "a") as f:
             f.write(f'{json.dumps({**config, "model_path": model_path})}\n')
 
-    def save(self, model: nn.Module):
-        torch.save(model, self._model_path)
+    def save(self, model: nn.Module, name: str):
+        torch.save(model, os.path.join(self._model_path, name))

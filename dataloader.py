@@ -43,7 +43,6 @@ class FlameDataset(Dataset):
         image = self._image_transform(image)
         mask = load_mask(mask_path)
         mask = self._mask_transform(mask)
-        mask = torch.squeeze(mask)
         return image, mask
 
 

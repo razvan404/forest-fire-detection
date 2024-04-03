@@ -46,7 +46,7 @@ class UNetTrainer:
             masks = masks.to(device)
 
             # forward
-            preds = torch.squeeze(model(images))
+            preds = model(images)
             loss = loss_function(preds, masks)
 
             # backward
@@ -86,7 +86,7 @@ class UNetTrainer:
             masks = masks.to(device)
 
             # forward
-            preds = torch.squeeze(model(images))
+            preds = model(images)
             loss = loss_function(preds, masks)
             loss = loss.cpu().item()
 
@@ -100,6 +100,7 @@ class UNetTrainer:
             targets.append(masks)
             predictions.append(preds)
 
+        total_loss /= len(loader)
         targets = np.concatenate(targets, axis=0)
         predictions = np.concatenate(predictions, axis=0)
         mpa, iou, fwiou = cls._compute_metrics(targets, predictions)
@@ -116,7 +117,7 @@ class UNetTrainer:
     ):
         model.eval()
         sample_images, sample_masks = next(iter(dataloader))
-        preds = torch.squeeze(model(sample_images.to(device)))
+        preds = model(sample_images.to(device))
         preds = predictions_function(preds)
 
         table = wandb.Table(columns=["Image", "True Mask", "Predicted Mask"])
@@ -137,6 +138,7 @@ class UNetTrainer:
             )
 
             seed = wandb_config["seed"]
+            resolution = wandb_config["resolution"]
             num_epochs = wandb_config["num_epochs"]
             batch_size = wandb_config["batch_size"]
             in_channels = wandb_config["in_channels"]
@@ -147,6 +149,7 @@ class UNetTrainer:
 
             print(f"{device = }")
             print(f"{seed = }")
+            print(f"{resolution = }")
 
             print(f"{num_epochs = }")
             print(f"{batch_size = }")
@@ -156,7 +159,9 @@ class UNetTrainer:
 
             torch.manual_seed(seed)
 
-            train_dataset, validation_dataset = flame_dataset_splits("dataset")
+            train_dataset, validation_dataset = flame_dataset_splits(
+                "dataset", work_resolution=resolution
+            )
             train_dataloader = DataLoader(
                 train_dataset, batch_size=batch_size, shuffle=True
             )
@@ -192,7 +197,7 @@ class UNetTrainer:
                     device,
                     f"Epoch {epoch} - Validation",
                 )
-                saver.save(model)
+                saver.save(model, f"checkpoint_{epoch}.pt")
 
                 table = cls._predictions_table(
                     model, validation_dataloader, predictions_function, device
