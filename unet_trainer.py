@@ -169,7 +169,7 @@ class UNetTrainer:
                 validation_dataset, batch_size=8, shuffle=False
             )
 
-            model = SegmentationUNet(in_channels, out_channels)
+            model = SegmentationUNet(in_channels, out_channels).to(device)
             loss_function = nn.BCEWithLogitsLoss()
             if out_channels == 1:
                 predictions_function = binary_predictions
