@@ -160,3 +160,5 @@ cython_debug/
 
 # Project
 dataset/
+saved_models/
+wandb/

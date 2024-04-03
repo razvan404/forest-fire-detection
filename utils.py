@@ -20,3 +20,11 @@ def torch_image_to_numpy(torch_image: torch.Tensor) -> np.ndarray:
     np_image = np.moveaxis(np_image, 0, -1)
     np_image = (np_image + 1) / 2
     return np_image
+
+
+def binary_predictions(raw_preds: torch.Tensor) -> torch.Tensor:
+    return (torch.sigmoid(raw_preds) >= 0.5).float()
+
+
+def multiclass_predictions(raw_preds: torch.Tensor) -> torch.Tensor:
+    return torch.argmax(raw_preds, dim=1)
