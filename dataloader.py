@@ -46,10 +46,8 @@ class FlameDataset(Dataset):
         return image, mask
 
 
-def flame_dataset_splits(
-    dataset_dir: str, min_resolution: int = 2160, work_resolution: int = 512
-):
-    image_transform = transforms.Compose(
+def build_image_transform(min_resolution: int = 2160, work_resolution: int = 512):
+    return transforms.Compose(
         [
             transforms.ToTensor(),
             transforms.CenterCrop(min_resolution),
@@ -58,7 +56,9 @@ def flame_dataset_splits(
         ]
     )
 
-    mask_transform = transforms.Compose(
+
+def build_mask_transform(min_resolution: int = 2160, work_resolution: int = 512):
+    return transforms.Compose(
         [
             transforms.ToTensor(),
             transforms.CenterCrop(min_resolution),
@@ -69,6 +69,13 @@ def flame_dataset_splits(
             ),
         ]
     )
+
+
+def flame_dataset_splits(
+    dataset_dir: str, min_resolution: int = 2160, work_resolution: int = 512
+):
+    image_transform = build_image_transform(min_resolution, work_resolution)
+    mask_transform = build_mask_transform(min_resolution, work_resolution)
 
     return (
         FlameDataset(dataset_dir, image_transform, mask_transform, "train"),

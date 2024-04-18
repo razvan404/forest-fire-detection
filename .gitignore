@@ -162,3 +162,4 @@ cython_debug/
 dataset/
 saved_models/
 wandb/
+binaries/

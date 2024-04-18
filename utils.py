@@ -28,3 +28,13 @@ def binary_predictions(raw_preds: torch.Tensor) -> torch.Tensor:
 
 def multiclass_predictions(raw_preds: torch.Tensor) -> torch.Tensor:
     return torch.argmax(raw_preds, dim=1)
+
+
+def save_model_to_binaries(model_path: str, save_path: str):
+    model = torch.load(model_path)
+    script = torch.jit.script(model)
+    script.save(save_path)
+
+
+def load_binaries(bin_path):
+    return torch.jit.load(bin_path)
