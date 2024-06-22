@@ -46,12 +46,16 @@ class FlameDataset(Dataset):
         return image, mask
 
 
-def build_image_transform(min_resolution: int = 2160, work_resolution: int = 512):
+def build_image_transform(min_resolution: int = 2160, work_resolution: int = 512, size: (int, int) = None):
     return transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.CenterCrop(min_resolution),
-            transforms.Resize((work_resolution, work_resolution), antialias=True),
+            *(
+                [transforms.Resize(size, antialias=True)] if size is not None else [
+                    transforms.CenterCrop(min_resolution),
+                    transforms.Resize((work_resolution, work_resolution), antialias=True),
+                ]
+            ),
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ]
     )

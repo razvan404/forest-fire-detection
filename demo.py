@@ -1,7 +1,6 @@
 import os
 import glob
 import gradio
-import numpy as np
 
 from dataloader import build_image_transform
 from utils import save_model_to_binaries, load_binaries, binary_predictions
@@ -16,13 +15,12 @@ def load_model(model_name):
     return load_binaries(model_path)
 
 
-model = load_model("baa5631f-7e43-4501-bf3a-c338c12be233")
+model = load_model("ad504ec7-53db-4096-970d-66249dbcf502").to('cuda')
 model.eval()
 
 
 def predict(image):
-    min_resolution = min(*image.shape[0:2])
-    image_transform = build_image_transform(min_resolution=min_resolution)
+    image_transform = build_image_transform(size=(720, 1280))
     transformed_image = image_transform(image)
     image = transformed_image.unsqueeze(0).to('cuda')
     mask = binary_predictions(model(image)).squeeze().cpu()
@@ -34,7 +32,6 @@ ui = gradio.Interface(
     inputs=gradio.Image(sources=["upload"]),
     outputs="image",
     title="Forest Fire Segmentation",
-    allow_flagging="never",
+    allow_flagging="never"
 )
-ui.dependencies[0]["show_progress"] = False
-ui.launch()
+ui.launch(share=True)
